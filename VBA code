@@ -1,0 +1,133 @@
+Option Explicit
+
+Sub WS()
+Dim i As Double, WS As Worksheet, LastRow As Double, j As Integer
+Dim sum As Double, k As Integer, LR As Double, bef As Double, af As Double
+Dim YC As Double, PC As Double, m As Integer
+Dim max1 As Double, min1 As Double, max2 As Double
+
+For Each WS In Worksheets
+
+    LastRow = WS.Cells(Rows.Count, 1).End(xlUp).Row
+    
+    WS.Range("I1") = "Ticker"
+    WS.Range("J1") = "Yearly Change"
+    WS.Range("K1") = "Percent Change"
+    WS.Range("L1") = "Total Stock Volume"
+    WS.Range("P1") = "Ticker"
+    WS.Range("Q1") = "Value"
+    WS.Range("O2") = "Greatest % Increase"
+    WS.Range("O3") = "Greatest % Decrease"
+    WS.Range("O4") = "Greatest Total Volume"
+    
+    j = 2
+    
+    For i = 2 To LastRow
+        
+        If i = 2 Then
+        
+            WS.Cells(i, 9) = WS.Cells(i, 1)
+            
+        
+        Else
+            If WS.Cells(i, 1) <> WS.Cells(i - 1, 1) Then
+                j = j + 1
+                WS.Cells(j, 9) = WS.Cells(i, 1)
+                
+                
+            End If
+        End If
+            
+    
+    Next i
+    
+    LR = WS.Cells(Rows.Count, 9).End(xlUp).Row
+
+    af = 0
+    
+    bef = 2
+    
+    For k = 2 To LR
+    
+        sum = Application.WorksheetFunction.SumIf(WS.Range("A" & 2, "A" & LastRow), WS.Cells(k, 9), WS.Range("G" & 2, "G" & LastRow))
+        WS.Cells(k, 12) = sum
+        If k = 2 Then
+            af = af + Application.WorksheetFunction.CountIf(WS.Range("A" & 2, "A" & LastRow), WS.Cells(k, 9)) + 1
+        Else
+            af = af + Application.WorksheetFunction.CountIf(WS.Range("A" & 2, "A" & LastRow), WS.Cells(k, 9))
+        End If
+        
+        YC = WS.Cells(af, 6) - WS.Cells(bef, 3)
+        WS.Cells(k, 10) = YC
+        
+        If WS.Cells(k, 10) < 0 Then
+            WS.Cells(k, 10).Interior.ColorIndex = 3
+        Else
+            WS.Cells(k, 10).Interior.ColorIndex = 4
+        End If
+        
+        
+        
+        
+        
+        
+
+        
+        If WS.Cells(bef, 3) = 0 Then
+            WS.Cells(k, 11) = 100 & "%"
+        Else
+            WS.Cells(k, 11) = YC / WS.Cells(bef, 3) * 100 & "%"
+        End If
+        
+        
+        bef = af + 1
+        
+        
+    
+    Next k
+    
+    
+    WS.Range("P2") = WS.Range("I2")
+    WS.Range("P3") = WS.Range("I2")
+    WS.Range("P4") = WS.Range("I2")
+    WS.Range("Q2") = WS.Range("K2")
+    WS.Range("Q3") = WS.Range("K2")
+    WS.Range("Q4") = WS.Range("L2")
+    
+    max1 = WS.Range("K2")
+    min1 = WS.Range("K2")
+    max2 = WS.Range("L2")
+    
+    
+    For m = 3 To LR
+    
+        If WS.Cells(m, 11) > max1 Then
+        
+        WS.Range("P2") = WS.Cells(m, 9)
+        WS.Range("Q2") = WS.Cells(m, 11) * 100 & "%"
+        max1 = WS.Cells(m, 11)
+        
+        ElseIf WS.Cells(m, 11) < min1 Then
+        
+        WS.Range("P3") = WS.Cells(m, 9)
+        WS.Range("Q3") = WS.Cells(m, 11) * 100 & "%"
+        min1 = WS.Cells(m, 11)
+        
+        End If
+        
+        If WS.Cells(m, 12) > max2 Then
+        
+        WS.Range("P4") = WS.Cells(m, 9)
+        WS.Range("Q4") = WS.Cells(m, 12)
+        max2 = WS.Cells(m, 12)
+        
+        End If
+    
+    Next m
+    
+    
+Next
+
+
+End Sub
+
